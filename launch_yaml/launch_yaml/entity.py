@@ -99,7 +99,7 @@ class Entity(BaseEntity):
         self,
         name: Text,
         *,
-        data_type: AllowedTypesType = str,
+        data_type: Optional[AllowedTypesType] = str,
         optional: bool = False,
         can_be_str: bool = True,
     ) -> Optional[Union[
