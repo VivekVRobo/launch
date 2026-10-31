@@ -14,6 +14,7 @@
 
 """Module for Entity class."""
 
+from typing import Any
 from typing import List
 from typing import Optional
 from typing import overload
@@ -58,6 +59,16 @@ class Entity:
     @overload
     def get_attr(self, name: Text, *, data_type: Type[TargetType],  # noqa: F811
                  can_be_str: bool = True) -> TargetType:
+        ...
+
+    @overload
+    def get_attr(self, name: Text, *, data_type: None,  # noqa: F811
+                 optional: bool, can_be_str: bool = True) -> Any:
+        ...
+
+    @overload
+    def get_attr(self, name: Text, *, data_type: None,  # noqa: F811
+                 can_be_str: bool = True) -> Any:
         ...
 
     @overload
