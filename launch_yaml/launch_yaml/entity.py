@@ -111,7 +111,9 @@ class Entity(BaseEntity):
 
         See :py:meth:`launch.frontend.Entity.get_attr`.
         `launch_yaml` does not apply type coercion,
-        it only checks if the read value is of the correct type.
+        it only checks if the read value is of the correct type. For
+        `arg` and `let` attributes, mapping syntax is normalized to the
+        existing list of name/value entities.
         """
         if name not in self.__element:
             if not optional:
@@ -123,6 +125,11 @@ class Entity(BaseEntity):
         self.__read_keys.add(name)
         data = self.__element[name]
         if check_is_list_entity(data_type):
+            if isinstance(data, dict) and name in ('arg', 'let'):
+                return [
+                    Entity({'name': key, 'value': value}, name)
+                    for key, value in data.items()
+                ]
             if isinstance(data, list) and isinstance(data[0], dict):
                 return [Entity(child, name) for child in data]
             raise TypeError(
