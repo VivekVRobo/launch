@@ -61,12 +61,11 @@ def test_include():
     assert ls.context.launch_configurations['baz'] == 'BAZ'
 
 
-
 def test_include_mapping_arguments():
     """Parse include arguments expressed as direct YAML mappings."""
     path = (Path(__file__).parent / 'executable.yaml').as_posix()
     yaml_file = \
-        """\\
+        """\
         launch:
         - let:
             name: 'main_baz'
