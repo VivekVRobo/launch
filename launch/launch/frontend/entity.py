@@ -14,6 +14,7 @@
 
 """Module for Entity class."""
 
+from typing import Any
 from typing import List
 from typing import Optional
 from typing import overload
@@ -43,13 +44,10 @@ class Entity:
         """Get the Entity's children."""
         raise NotImplementedError()
 
-    # We need a few overloads for type checking:
-    # - Depending on optional, the return value is either T or Optional[T].
-    # Unfortunately, if the optional is not present, we need another overload to denote the
-    # default, so this has three values: true, false and not present.
-    # - If no data type is passed, the return type is str. Similar to the above, it has two
-    # possibilities: present or not present.
-    # => 6 overloads to cover every combination
+    # Overloads distinguish an explicitly typed attribute from the default string form,
+    # and account for attributes that may be absent.
+    # Passing data_type=None is also supported, but its parsed value depends on the frontend;
+    # use Any for that dynamic return type.
     @overload
     def get_attr(self, name: Text, *, data_type: Type[TargetType],  # noqa: F811
                  optional: bool, can_be_str: bool = True) -> Optional[TargetType]:
@@ -58,6 +56,16 @@ class Entity:
     @overload
     def get_attr(self, name: Text, *, data_type: Type[TargetType],  # noqa: F811
                  can_be_str: bool = True) -> TargetType:
+        ...
+
+    @overload
+    def get_attr(self, name: Text, *, data_type: None,  # noqa: F811
+                 optional: bool, can_be_str: bool = True) -> Optional[Any]:
+        ...
+
+    @overload
+    def get_attr(self, name: Text, *, data_type: None,  # noqa: F811
+                 can_be_str: bool = True) -> Any:
         ...
 
     @overload
@@ -86,7 +94,7 @@ class Entity:
 
         See :py:obj:`launch.utilities.AllowedTypesTuple` to see what types are allowed.
 
-        `data_type = None` will result in yaml parsing of the attribute value as a string.
+        Passing `data_type=None` requests the frontend's untyped parsing behavior.
 
         `List[Entity]` allows accessing a list of subentities with an specific name.
 
