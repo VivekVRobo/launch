@@ -99,7 +99,7 @@ class Entity(BaseEntity):
         self,
         name: Text,
         *,
-        data_type: AllowedTypesType = str,
+        data_type: Optional[AllowedTypesType] = str,
         optional: bool = False,
         can_be_str: bool = True,
     ) -> Optional[Union[
@@ -122,7 +122,7 @@ class Entity(BaseEntity):
                 return None
         self.__read_keys.add(name)
         data = self.__element[name]
-        if check_is_list_entity(data_type):
+        if data_type is not None and check_is_list_entity(data_type):
             if isinstance(data, list) and isinstance(data[0], dict):
                 return [Entity(child, name) for child in data]
             raise TypeError(
