@@ -76,7 +76,7 @@ class Entity(BaseEntity):
         self,
         name: Text,
         *,
-        data_type: AllowedTypesType = str,
+        data_type: Optional[AllowedTypesType] = str,
         optional: bool = False,
         can_be_str: bool = True,
     ) -> Optional[Union[
@@ -95,7 +95,7 @@ class Entity(BaseEntity):
                 name, data_type, self.type_name
             )
         )
-        if check_is_list_entity(data_type):
+        if data_type is not None and check_is_list_entity(data_type):
             return_list = [x for x in self.__xml_element if x.tag == name]
             if not return_list:
                 if optional:
