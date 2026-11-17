@@ -112,7 +112,15 @@ class Entity(BaseEntity):
             else:
                 self.__read_attributes.add(name_sep)
                 sep = self.__xml_element.attrib[name_sep]
-                value = self.__xml_element.attrib[name].split(sep)
+                raw_value = self.__xml_element.attrib[name]
+                # Keep substitution-bearing values intact so the substitution can be
+                # resolved before list coercion. Splitting the raw XML string first
+                # turns a substituted list into a one-element list containing the
+                # unresolved substitution, preventing List[T] coercion after resolution.
+                if can_be_str and '$(' in raw_value:
+                    value = raw_value
+                else:
+                    value = raw_value.split(sep)
             self.__read_attributes.add(name)
         if value is None:
             if not optional:
