@@ -18,6 +18,9 @@ import io
 import textwrap
 from typing import List
 
+from launch import LaunchContext
+from launch.utilities.type_utils import perform_typed_substitution
+
 from parser_no_extensions import load_no_extensions
 
 
@@ -37,6 +40,26 @@ def test_list():
     assert tags[0].get_attr('attr', data_type=List[str]) == ['1', '2', '3']
     assert tags[0].get_attr('attr', data_type=List[int]) == [1, 2, 3]
     assert tags[0].get_attr('attr', data_type=List[float]) == [1., 2., 3.]
+
+
+def test_list_with_substitution():
+    """Resolve a substituted list after applying the XML separator."""
+    xml_file = \
+        """\
+        <root>
+            <tag attr="$(var int_array)" attr-sep=","/>
+        </root>
+        """
+    xml_file = textwrap.dedent(xml_file)
+    root_entity, parser = load_no_extensions(io.StringIO(xml_file))
+    tag = root_entity.children[0]
+
+    value = tag.get_attr('attr', data_type=List[int], can_be_str=True)
+    normalized_value = parser.parse_if_substitutions(value)
+
+    context = LaunchContext()
+    context.launch_configurations['int_array'] = '1,2,3'
+    assert perform_typed_substitution(context, normalized_value, List[int]) == [1, 2, 3]
 
 
 if __name__ == '__main__':
